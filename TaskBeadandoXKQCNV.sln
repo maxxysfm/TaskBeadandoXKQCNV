@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30011.22
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "TaskBeadandoXKQCNV", "TaskBeadandoXKQCNV.fsproj", "{AAAED4A7-0560-4775-A750-C5F91CDFB7DF}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{AAAED4A7-0560-4775-A750-C5F91CDFB7DF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AAAED4A7-0560-4775-A750-C5F91CDFB7DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AAAED4A7-0560-4775-A750-C5F91CDFB7DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AAAED4A7-0560-4775-A750-C5F91CDFB7DF}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {616DBC2F-315A-4B8B-AF30-A473520255E2}
+	EndGlobalSection
+EndGlobal
