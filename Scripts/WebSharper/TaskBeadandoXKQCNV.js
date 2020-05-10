@@ -1,7 +1,7 @@
 (function()
 {
  "use strict";
- var Global,TaskBeadandoXKQCNV,Path,CanvasNode,Client,SC$1,WebSharper,UI,Doc,AttrProxy,Arrays,Strings,Arrays2D,Operators,Enumerator,console,Html,Client$1,Operators$1,Attr,Tags,EventsPervasives,Var$1,IntelliFactory,Runtime;
+ var Global,TaskBeadandoXKQCNV,Path,CanvasNode,Client,SC$1,WebSharper,UI,Doc,AttrProxy,Strings,Arrays2D,Operators,Enumerator,Arrays,console,Html,Client$1,Operators$1,Attr,Tags,EventsPervasives,Var$1,IntelliFactory,Runtime;
  Global=self;
  TaskBeadandoXKQCNV=Global.TaskBeadandoXKQCNV=Global.TaskBeadandoXKQCNV||{};
  Path=TaskBeadandoXKQCNV.Path=TaskBeadandoXKQCNV.Path||{};
@@ -12,11 +12,11 @@
  UI=WebSharper&&WebSharper.UI;
  Doc=UI&&UI.Doc;
  AttrProxy=UI&&UI.AttrProxy;
- Arrays=WebSharper&&WebSharper.Arrays;
  Strings=WebSharper&&WebSharper.Strings;
  Arrays2D=WebSharper&&WebSharper.Arrays2D;
  Operators=WebSharper&&WebSharper.Operators;
  Enumerator=WebSharper&&WebSharper.Enumerator;
+ Arrays=WebSharper&&WebSharper.Arrays;
  console=Global.console;
  Html=WebSharper&&WebSharper.Html;
  Client$1=Html&&Html.Client;
@@ -38,30 +38,27 @@
  };
  Client.Main=function()
  {
-  return Doc.Element("div",[AttrProxy.Create("style","\n        text-align: center; ")],[Doc.Button("Pick Start",[AttrProxy.Create("style","background: #a8ffa8;color:black;")],function()
+  return Doc.Element("div",[AttrProxy.Create("style","text-align: center; ")],[Doc.Button("Pick Start",[AttrProxy.Create("style","background: #a8ffa8;color:black;")],function()
   {
-   Global.alert("");
+   Client.set_brushMode(2);
   }),Doc.Button("Pick End",[AttrProxy.Create("style","background: #aba8ff;color:black;")],function()
   {
-   Global.alert("");
-  }),Doc.Element("table",[],[Doc.Element("tr",[],[Doc.Element("td",[],[Doc.Element("h3",[],[Doc.TextNode("Brush size:")]),Doc.Input([AttrProxy.Create("style","width:75px"),AttrProxy.Create("type","range"),AttrProxy.Create("min","3"),AttrProxy.Create("max","40"),AttrProxy.Create("class","slider")],Client.brushSize())]),Doc.Element("td",[],[Doc.Element("h2",[],[Doc.TextNode("Toggle brush types:")]),Doc.Button("",[AttrProxy.Create("style","color:#a434b3;"),AttrProxy.Create("class","fa fa-eraser")],function()
+   Client.set_brushMode(3);
+  }),Doc.Element("table",[],[Doc.Element("th",[],[Doc.Element("tr",[],[Doc.Element("h3",[],[Doc.TextNode("Brush size:")]),Doc.Input([AttrProxy.Create("style","width:75px"),AttrProxy.Create("type","range"),AttrProxy.Create("min","3"),AttrProxy.Create("max","40"),AttrProxy.Create("class","slider")],Client.brushSize())]),Doc.Element("tr",[],[Doc.Element("h2",[],[Doc.TextNode("Toggle brush types:")]),Doc.Button("",[AttrProxy.Create("style","color:#a434b3;"),AttrProxy.Create("class","fa fa-eraser")],function()
   {
    Client.set_brushMode(1);
   }),Doc.Button("",[AttrProxy.Create("style","color:#b35034;"),AttrProxy.Create("class","fa fa-edit")],function()
   {
    Client.set_brushMode(0);
-  })])])]),Doc.Element("br",[],[]),Doc.Button("Create path!",[],function()
+  })]),Doc.Element("tr",[],[Doc.Button("Create path!",[],function()
   {
-   var counter,imgd,result,CanvasResult,i,e,x,i$1,e$1,y,i$2,e$2,x$1,i$3,e$3,y$1;
+   var $1,counter,imgd,result,CanvasResult,i,e,x,i$1,e$1,y;
    function Next()
    {
     counter=counter+1;
    }
-   function DebugDisplay(a,b)
-   {
-    return Global.String(a)+" "+Global.String(b)+" "+("Red: "+Global.String(Arrays.get2D(CanvasResult,a,b).Red)+" ")+("Green: "+Global.String(Arrays.get2D(CanvasResult,a,b).Green)+" ")+("Blue: "+Global.String(Arrays.get2D(CanvasResult,a,b).Blue)+" ")+("Alpha: "+Global.String(Arrays.get2D(CanvasResult,a,b).Alpha)+" ")+"\n";
-   }
    imgd=Client.ctx().getImageData(0,0,Client.canvas().width,Client.canvas().height).data;
+   Client.set_CachedCanvas(Client.ctx().getImageData(0,0,Client.canvas().width,Client.canvas().height));
    result=Strings.SplitChars(Global.String(imgd),[","],0);
    CanvasResult=Arrays2D.init(Client.canvas().width,Client.canvas().height,function()
    {
@@ -104,45 +101,18 @@
     if(typeof e=="object"&&"Dispose"in e)
      e.Dispose();
    }
-   Global.alert(DebugDisplay(0,0)+DebugDisplay(2,2)+DebugDisplay(5,5));
    console.log(Global.String(imgd));
    console.log(CanvasResult);
-   Client.canvas().height=Client.canvas().height;
-   Client.canvas().width=Client.canvas().width;
-   i$2=Operators.step(0,1,Client.canvas().width-1);
-   e$2=Enumerator.Get(i$2);
-   try
-   {
-    while(e$2.MoveNext())
-     {
-      x$1=e$2.Current();
-      i$3=Operators.step(0,1,Client.canvas().height-1);
-      e$3=Enumerator.Get(i$3);
-      try
-      {
-       while(e$3.MoveNext())
-        {
-         y$1=e$3.Current();
-         Arrays.get2D(CanvasResult,x$1,y$1).Alpha>0?(Client.ctx().fillStyle="#000000",Client.ctx().fillRect(y$1,x$1,1,1)):void 0;
-        }
-      }
-      finally
-      {
-       if(typeof e$3=="object"&&"Dispose"in e$3)
-        e$3.Dispose();
-      }
-     }
-   }
-   finally
-   {
-    if(typeof e$2=="object"&&"Dispose"in e$2)
-     e$2.Dispose();
-   }
+   console.log(Client.autoPathfind().Get());
+  })]),Doc.Element("tr",[],[Doc.Element("h3",[AttrProxy.Create("style","text-align: center;")],[Doc.TextNode("Auto pathfind:")]),Doc.CheckBox([AttrProxy.Create("style","text-align: center;\n                    vertical-align: middle;\n                    margin-left: 50px;")],Client.autoPathfind())])])]),Doc.Element("br",[],[]),Doc.Button("Debug",[],function()
+  {
+   Client.ctx().putImageData(Client.CachedCanvas(),0,0);
   }),Doc.Element("div",[],[Doc.Element("h1",[],[Doc.TextNode("Edit map")]),Doc.Element("table",[],[Doc.Element("tr",[],[Doc.Element("td",[],[Doc.Element("h3",[],[Doc.TextNode("Map Size:")]),Doc.Input([AttrProxy.Create("style","width:100px"),AttrProxy.Create("type","range"),AttrProxy.Create("min","100"),AttrProxy.Create("max","800"),AttrProxy.Create("class","slider")],Client.MapSize())]),Doc.Element("td",[],[Doc.Button("Reset/Clear",[AttrProxy.Create("style","background: red;color:white;")],function()
   {
    Client.canvas().height=Operators.toInt(Global.Number(Client.MapSize().Get()));
    Client.canvas().width=Operators.toInt(Global.Number(Client.MapSize().Get()));
    Client.ctx().lineCap="round";
+   Client.draw();
   })])])])])]);
  };
  Client.Canvas=function()
@@ -161,7 +131,7 @@
    Client.ctx().beginPath();
    Client.ctx().strokeStyle="#000000";
    Client.ctx().fillStyle="#000000";
-   return Client.drawFixedPoints();
+   return Client.draw();
   }
   function a$4(el,args)
   {
@@ -172,12 +142,12 @@
   }
   function a$5(el,args)
   {
-   var p,y,x$5;
+   var p,y,x$5,increasedSize,sizeConverted;
    p=Client.getXYFromMouseEvent(el,args);
    y=p[1];
    x$5=p[0];
    Client.updatePos(x$5,y);
-   return(Client.inLine())[0]?(Client.ctx().moveTo((Client.lastX())[0],(Client.lastY())[0]),Client.ctx().lineTo(x$5,y),Client.ctx().lineWidth=Global.Number(Client.brushSize().Get()),Client.brushMode()===0?Client.ctx().stroke():void 0,Client.brushMode()===1?(Client.ctx().strokeStyle="rgba(0,0,0,0)",Client.ctx().clearRect(x$5-Global.Number(Client.brushSize().Get())/2,y-Global.Number(Client.brushSize().Get())/2,Global.Number(Client.brushSize().Get()),Global.Number(Client.brushSize().Get())),Client.ctx().stroke()):void 0,(Client.lastX())[0]=x$5,(Client.lastY())[0]=y,Client.drawFixedPoints()):null;
+   return(Client.inLine())[0]?(Client.ctx().moveTo((Client.lastX())[0],(Client.lastY())[0]),Client.ctx().lineTo(x$5,y),Client.ctx().lineWidth=Global.Number(Client.brushSize().Get()),Client.brushMode()===0?Client.ctx().stroke():void 0,Client.brushMode()===1?(increasedSize=20,sizeConverted=Global.Number(Client.brushSize().Get())+increasedSize,Client.ctx().clearRect(x$5+increasedSize-sizeConverted,y+increasedSize-sizeConverted,sizeConverted,sizeConverted)):void 0,Client.brushMode()===2?(Client.clearStart(),Client.set_startX(x$5),Client.set_startY(y)):void 0,Client.brushMode()===3?(Client.clearEnd(),Client.set_endX(x$5),Client.set_endY(y)):void 0,(Client.lastX())[0]=x$5,(Client.lastY())[0]=y,Client.draw()):null;
   }
   function a$6(el,args)
   {
@@ -189,7 +159,7 @@
   {
    (Client.inLine())[0]=false;
   }
-  Client.drawFixedPoints();
+  Client.draw();
   Client.ctx().scale(1,1);
   return Operators$1.add((a=[Attr.Attr().NewAttr("style","\n        text-align: center; \n        -ms-interpolation-mode: nearest-neighbor;\n        image-rendering: pixelated;\n        cursor: crosshair")],Tags.Tags().NewTag("div",a)),[Client.labelPos(),Tags.Tags().NewTag("br",[]),(x=(x$1=(x$2=(x$3=(x$4=Operators$1.add(Client.element(),[Attr.Attr().NewAttr("style","border: 1px solid gray")]),(function(a$8)
   {
@@ -238,20 +208,28 @@
    },a$8);
   }(x),x)),(a$1=[(a$2=[Tags.Tags().text("Draw with your mouse")],Tags.Tags().NewTag("b",a$2))],Tags.Tags().NewTag("p",a$1))]);
  };
- Client.drawFixedPoints=function()
+ Client.draw=function()
  {
   Client.drawStart();
   Client.drawEnd();
  };
+ Client.clearEnd=function()
+ {
+  Client.ctx().clearRect(Client.endX(),Client.endY(),Client.BorderSize(),Client.BorderSize());
+ };
  Client.drawEnd=function()
  {
   Client.ctx().fillStyle="#0000ff";
-  Client.ctx().fillRect(Client.endX(),Client.endY(),10,10);
+  Client.ctx().fillRect(Client.endX(),Client.endY(),Client.BorderSize(),Client.BorderSize());
+ };
+ Client.clearStart=function()
+ {
+  Client.ctx().clearRect(Client.startX(),Client.startY(),Client.BorderSize(),Client.BorderSize());
  };
  Client.drawStart=function()
  {
-  Client.ctx().fillStyle="#ff0000";
-  Client.ctx().fillRect(Client.startX(),Client.startY(),10,10);
+  Client.ctx().fillStyle="#00ff00";
+  Client.ctx().fillRect(Client.startX(),Client.startY(),Client.BorderSize(),Client.BorderSize());
  };
  Client.ctx=function()
  {
@@ -307,6 +285,21 @@
   SC$1.$cctor();
   return SC$1.MapSize;
  };
+ Client.CachedCanvas=function()
+ {
+  SC$1.$cctor();
+  return SC$1.CachedCanvas;
+ };
+ Client.set_CachedCanvas=function($1)
+ {
+  SC$1.$cctor();
+  SC$1.CachedCanvas=$1;
+ };
+ Client.autoPathfind=function()
+ {
+  SC$1.$cctor();
+  return SC$1.autoPathfind;
+ };
  Client.brushMode=function()
  {
   SC$1.$cctor();
@@ -327,38 +320,72 @@
   SC$1.$cctor();
   return SC$1.endY;
  };
+ Client.set_endY=function($1)
+ {
+  SC$1.$cctor();
+  SC$1.endY=$1;
+ };
  Client.endX=function()
  {
   SC$1.$cctor();
   return SC$1.endX;
+ };
+ Client.set_endX=function($1)
+ {
+  SC$1.$cctor();
+  SC$1.endX=$1;
  };
  Client.startY=function()
  {
   SC$1.$cctor();
   return SC$1.startY;
  };
+ Client.set_startY=function($1)
+ {
+  SC$1.$cctor();
+  SC$1.startY=$1;
+ };
  Client.startX=function()
  {
   SC$1.$cctor();
   return SC$1.startX;
  };
- Client.rvInput=function()
+ Client.set_startX=function($1)
  {
   SC$1.$cctor();
-  return SC$1.rvInput;
+  SC$1.startX=$1;
+ };
+ Client.BorderSize=function()
+ {
+  SC$1.$cctor();
+  return SC$1.BorderSize;
+ };
+ Client.initialOffset=function()
+ {
+  SC$1.$cctor();
+  return SC$1.initialOffset;
+ };
+ Client.initialSize=function()
+ {
+  SC$1.$cctor();
+  return SC$1.initialSize;
  };
  SC$1.$cctor=function()
  {
   var $1,a;
   SC$1.$cctor=Global.ignore;
-  SC$1.rvInput=Var$1.Create$1("");
-  SC$1.startX=2;
-  SC$1.startY=2;
-  SC$1.endX=250;
-  SC$1.endY=250;
-  SC$1.brushSize=Var$1.Create$1(Global.String(5));
+  SC$1.initialSize=500;
+  SC$1.initialOffset=25;
+  SC$1.BorderSize=12;
+  SC$1.startX=Client.initialOffset();
+  SC$1.startY=Client.initialOffset();
+  SC$1.endX=Client.initialSize()-Client.initialOffset();
+  SC$1.endY=Client.initialSize()-Client.initialOffset();
+  SC$1.brushSize=Var$1.Create$1(Global.String(15));
   SC$1.brushMode=0;
-  SC$1.MapSize=Var$1.Create$1(Global.String(500));
+  SC$1.autoPathfind=Var$1.Create$1(false);
+  SC$1.CachedCanvas=null;
+  SC$1.MapSize=Var$1.Create$1(Global.String(Client.initialSize()));
   SC$1.element=Tags.Tags().NewTag("canvas",[]);
   $1=[[0],[0],[false]];
   SC$1.lastY=$1[1];
