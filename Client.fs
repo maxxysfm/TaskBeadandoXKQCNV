@@ -7,31 +7,13 @@ open WebSharper.UI.Client
 open WebSharper.UI.Html
 open WebSharper.Html.Client
 
-
-module CanvasExtra =
-    type CanvasNode =
-        {
-            mutable Red: int
-            mutable Green: int
-            mutable Blue: int
-            mutable Alpha: int
-        }
-
-module Pathfinder =
-    type Node =
-        {
-            mutable AxisX: int
-            mutable AxisY: int
-            mutable HCost: int
-            mutable GCost: int
-            mutable FCost: int
-        }
-
 [<JavaScript>]
 module Client =
     
     open CanvasExtra
-    open Pathfinder
+    open Pathfind
+
+    //
 
     // Pálya beállítások
     let initialSize = 500
@@ -105,6 +87,9 @@ module Client =
         drawStart()
         drawEnd()
 
+    [<Inline "$obj">]
+    let Foo (obj: CanvasPixelArray) = X<CanvasNode[][]>
+    
     // https://stackoverflow.com/questions/667045/getpixel-from-html-canvas
     [<SPAEntryPoint>]
     let Canvas () =
@@ -233,25 +218,13 @@ module Client =
 
                         // Csak ilyen módon tudtam visszajuttatni a Canvas értékeit, egy string listában. Ezt fel kell radabolni hogy értelmezni is lehessen.
                         // A következő alapján működik: Első 4 elem: Első pixel R, G, B, Alpha értéke, így folytatva folyamatosan
-                        let imgd = CachedCanvas.Data
+                        
+                        // Konzultáció után
+                        let imgd = Foo CachedCanvas.Data
+                        //let imgd = CachedCanvas.Data
 
                         // https://www.dotnetperls.com/split-fs
                         let result = (string imgd).Split ','
-                        
-                        // https://docs.microsoft.com/en-us/dotnet/fsharp/language-reference/arrays
-                        // Cél: Feldaraboljuk a string értékeit könnyebben értelmezhető 2 dimenziós listába
-                        let CanvasResult = Array2D.init canvas.Width canvas.Height (fun _ _ -> 
-                            
-                            // Mindegyik értéknek egy új instancenak kell lennie
-                            let x : CanvasNode = 
-                                { 
-                                    Red = 0;
-                                    Green = 0;
-                                    Blue = 0;
-                                    Alpha = 0
-                                }
-                            x
-                            )
 
                         // String elemeinek lebontása
                         let CanvasFilled = 
@@ -260,17 +233,21 @@ module Client =
                             let mutable counter = 0
                             let Next() = counter <- counter + 1
                             
-                            for x in  0 .. 1 .. (canvas.Width-1)  do
-                                for y in 0 .. 1 .. (canvas.Height-1)  do
+                            for x in  0 .. (canvas.Width-1)  do
+                                for y in 0 .. (canvas.Height-1)  do
                                     
                                     // 4 elemenként: a sorrend: R, G, B, Alpha
-                                    CanvasResult.[x,y].Red <- (int result.[counter])
+                                    imgd.[x].[y].Red <- (int result.[counter])
+                                    //CanvasResult.[x,y].Red <- (int result.[counter])
                                     Next()
-                                    CanvasResult.[x,y].Green <- (int result.[counter])
+                                    imgd.[x].[y].Green <- (int result.[counter])
+                                    //CanvasResult.[x,y].Green <- (int result.[counter])
                                     Next()
-                                    CanvasResult.[x,y].Blue <- (int result.[counter])
+                                    imgd.[x].[y].Blue <- (int result.[counter])
+                                    //CanvasResult.[x,y].Blue <- (int result.[counter])
                                     Next()
-                                    CanvasResult.[x,y].Alpha <- (int result.[counter])
+                                    imgd.[x].[y].Alpha <- (int result.[counter])
+                                    //CanvasResult.[x,y].Alpha <- (int result.[counter])
                                     Next()
                         
                         CanvasFilled
@@ -278,16 +255,16 @@ module Client =
                         // Konzolos kirajzoláshoz, böngésző debug funkcióhoz
                         let DebugDisplay (a:int,b:int)= 
                             let p1 = string a + " "+ string b+ " "
-                            let p2 = "Red: " + (string CanvasResult.[a,b].Red) + " "
-                            let p3 = "Green: " + (string CanvasResult.[a,b].Green) + " "
-                            let p4 = "Blue: " + (string CanvasResult.[a,b].Blue) + " "
-                            let p5 = "Alpha: " + (string CanvasResult.[a,b].Alpha) + " "
+                            let p2 = "Red: " + (string imgd.[a].[b].Red) + " "
+                            let p3 = "Green: " + (string imgd.[a].[b].Green) + " "
+                            let p4 = "Blue: " + (string imgd.[a].[b].Blue) + " "
+                            let p5 = "Alpha: " + (string imgd.[a].[b].Alpha) + " "
                             p1+p2+p3+p4+p5 + "\n"
 
                         // Teszteléskor használva volt
                         // JS.Alert(DebugDisplay(0,0)+ DebugDisplay(2,2) + DebugDisplay(5,5))
                         Console.Log(string imgd) // String
-                        Console.Log(CanvasResult) // Böngészőben vizsgálható így (Console, array stb)
+                        Console.Log(imgd) // Böngészőben vizsgálható így (Console, array stb)
 
                         // Tömb kiírása
                         let Debug() =
@@ -302,10 +279,10 @@ module Client =
                                         *)
                                     //(*
                                     ctx.FillStyle <- "rgba(
-                                    "+(string CanvasResult.[x,y].Red)+",
-                                    "+(string CanvasResult.[x,y].Green)+",
-                                    "+(string CanvasResult.[x,y].Blue)+",
-                                    "+(string CanvasResult.[x,y].Alpha)+")"
+                                    "+(string imgd.[x].[y].Red)+",
+                                    "+(string imgd.[x].[y].Green)+",
+                                    "+(string imgd.[x].[y].Blue)+",
+                                    "+(string imgd.[x].[y].Alpha)+")"
                                     ctx.FillRect(float y, float x, float 1, float 1)
                                     //*)
                             ctx.LineCap <- LineCap.Round

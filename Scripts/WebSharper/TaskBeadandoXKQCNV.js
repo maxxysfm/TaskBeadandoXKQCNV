@@ -1,11 +1,9 @@
 (function()
 {
  "use strict";
- var Global,TaskBeadandoXKQCNV,Path,CanvasNode,Client,SC$1,WebSharper,UI,Doc,AttrProxy,Strings,Arrays2D,Operators,Enumerator,Arrays,console,Html,Client$1,Operators$1,Attr,Tags,EventsPervasives,Var$1,IntelliFactory,Runtime;
+ var Global,TaskBeadandoXKQCNV,Client,SC$1,WebSharper,UI,Doc,AttrProxy,Strings,Arrays2D,Operators,Enumerator,Arrays,console,Html,Client$1,Operators$1,Attr,Tags,EventsPervasives,Var$1,IntelliFactory,Runtime;
  Global=self;
  TaskBeadandoXKQCNV=Global.TaskBeadandoXKQCNV=Global.TaskBeadandoXKQCNV||{};
- Path=TaskBeadandoXKQCNV.Path=TaskBeadandoXKQCNV.Path||{};
- CanvasNode=Path.CanvasNode=Path.CanvasNode||{};
  Client=TaskBeadandoXKQCNV.Client=TaskBeadandoXKQCNV.Client||{};
  SC$1=Global.StartupCode$TaskBeadandoXKQCNV$Client=Global.StartupCode$TaskBeadandoXKQCNV$Client||{};
  WebSharper=Global.WebSharper;
@@ -27,15 +25,6 @@
  Var$1=UI&&UI.Var$1;
  IntelliFactory=Global.IntelliFactory;
  Runtime=IntelliFactory&&IntelliFactory.Runtime;
- CanvasNode.New=function(Red,Green,Blue,Alpha)
- {
-  return{
-   Red:Red,
-   Green:Green,
-   Blue:Blue,
-   Alpha:Alpha
-  };
- };
  Client.Main=function()
  {
   return Doc.Element("div",[AttrProxy.Create("style","text-align: center; ")],[Doc.Button("Pick Start",[AttrProxy.Create("style","background: #a8ffa8;color:black;")],function()
@@ -57,12 +46,17 @@
    {
     counter=counter+1;
    }
-   imgd=Client.ctx().getImageData(0,0,Client.canvas().width,Client.canvas().height).data;
    Client.set_CachedCanvas(Client.ctx().getImageData(0,0,Client.canvas().width,Client.canvas().height));
+   imgd=Client.CachedCanvas().data;
    result=Strings.SplitChars(Global.String(imgd),[","],0);
    CanvasResult=Arrays2D.init(Client.canvas().width,Client.canvas().height,function()
    {
-    return CanvasNode.New(0,0,0,0);
+    return{
+     Red:0,
+     Green:0,
+     Blue:0,
+     Alpha:0
+    };
    });
    counter=0;
    i=Operators.step(0,1,Client.canvas().width-1);
@@ -104,10 +98,7 @@
    console.log(Global.String(imgd));
    console.log(CanvasResult);
    console.log(Client.autoPathfind().Get());
-  })]),Doc.Element("tr",[],[Doc.Element("h3",[AttrProxy.Create("style","text-align: center;")],[Doc.TextNode("Auto pathfind:")]),Doc.CheckBox([AttrProxy.Create("style","text-align: center;\n                    vertical-align: middle;\n                    margin-left: 50px;")],Client.autoPathfind())])])]),Doc.Element("br",[],[]),Doc.Button("Debug",[],function()
-  {
-   Client.ctx().putImageData(Client.CachedCanvas(),0,0);
-  }),Doc.Element("div",[],[Doc.Element("h1",[],[Doc.TextNode("Edit map")]),Doc.Element("table",[],[Doc.Element("tr",[],[Doc.Element("td",[],[Doc.Element("h3",[],[Doc.TextNode("Map Size:")]),Doc.Input([AttrProxy.Create("style","width:100px"),AttrProxy.Create("type","range"),AttrProxy.Create("min","100"),AttrProxy.Create("max","800"),AttrProxy.Create("class","slider")],Client.MapSize())]),Doc.Element("td",[],[Doc.Button("Reset/Clear",[AttrProxy.Create("style","background: red;color:white;")],function()
+  })]),Doc.Element("tr",[],[Doc.Element("h3",[AttrProxy.Create("style","text-align: center;")],[Doc.TextNode("Auto pathfind:")]),Doc.CheckBox([AttrProxy.Create("style","text-align: center;\r\n                    vertical-align: middle;\r\n                    margin-left: 50px;")],Client.autoPathfind())])])]),Doc.Element("br",[],[]),Doc.Element("div",[],[Doc.Element("h1",[],[Doc.TextNode("Edit map")]),Doc.Element("table",[],[Doc.Element("tr",[],[Doc.Element("td",[],[Doc.Element("h3",[],[Doc.TextNode("Map Size:")]),Doc.Input([AttrProxy.Create("style","width:100px"),AttrProxy.Create("type","range"),AttrProxy.Create("min","100"),AttrProxy.Create("max","800"),AttrProxy.Create("class","slider")],Client.MapSize())]),Doc.Element("td",[],[Doc.Button("Reset/Clear",[AttrProxy.Create("style","background: red;color:white;")],function()
   {
    Client.canvas().height=Operators.toInt(Global.Number(Client.MapSize().Get()));
    Client.canvas().width=Operators.toInt(Global.Number(Client.MapSize().Get()));
@@ -161,7 +152,7 @@
   }
   Client.draw();
   Client.ctx().scale(1,1);
-  return Operators$1.add((a=[Attr.Attr().NewAttr("style","\n        text-align: center; \n        -ms-interpolation-mode: nearest-neighbor;\n        image-rendering: pixelated;\n        cursor: crosshair")],Tags.Tags().NewTag("div",a)),[Client.labelPos(),Tags.Tags().NewTag("br",[]),(x=(x$1=(x$2=(x$3=(x$4=Operators$1.add(Client.element(),[Attr.Attr().NewAttr("style","border: 1px solid gray")]),(function(a$8)
+  return Operators$1.add((a=[Attr.Attr().NewAttr("style","\r\n        text-align: center; \r\n        -ms-interpolation-mode: nearest-neighbor;\r\n        image-rendering: pixelated;\r\n        cursor: crosshair")],Tags.Tags().NewTag("div",a)),[Client.labelPos(),Tags.Tags().NewTag("br",[]),(x=(x$1=(x$2=(x$3=(x$4=Operators$1.add(Client.element(),[Attr.Attr().NewAttr("style","border: 1px solid gray")]),(function(a$8)
   {
    EventsPervasives.Events().OnMouseDown(function($1)
    {
