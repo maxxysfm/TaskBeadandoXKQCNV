@@ -16,19 +16,20 @@ module Client =
     //
 
     // Pálya beállítások
-    let initialSize = 500
-    let initialOffset = 25
-    let BorderSize = 12.0
+    let initialSize = 50
+    let initialOffset = 3
+    let BorderSize = 3.0
     let mutable startX: int = initialOffset
     let mutable startY: int = initialOffset
     let mutable endX:int = initialSize - initialOffset
     let mutable endY:int = initialSize - initialOffset
     
     // Brush beállítások
-    let brushSize = Var.Create (string 15)
+    let brushSize = Var.Create (string 2)
     let mutable brushMode = 0
 
-    // Beállítások
+    // Beállítások A*-hoz
+    let collisionSize = Var.Create (string 1)
     let autoPathfind = Var.Create false
     
     // Mentés
@@ -87,6 +88,9 @@ module Client =
         drawStart()
         drawEnd()
 
+    let restoreCache() =
+        ctx.PutImageData(CachedCanvas,0.0,0.0)
+
     [<Inline "$obj">]
     let Foo (obj: CanvasPixelArray) = X<CanvasNode[][]>
     
@@ -95,16 +99,22 @@ module Client =
     let Canvas () =
         
         draw()
-        ctx.Scale(1.0,1.0)
-        
-        Div [Attr.Style "
+
+        //let upscaleRatio = 2.0
+
+        Div [
+        Attr.Class "zoom"
+        Attr.Style "
+        width:300px;
+        border: 4px;
         text-align: center; 
+        cursor: crosshair;
+        image-rendering: crisp-edges;
         -ms-interpolation-mode: nearest-neighbor;
-        image-rendering: pixelated;
-        cursor: crosshair"] -< [
+        "] -< [
             labelPos
             Br []
-            element -< [Attr.Style "border: 1px solid gray"]
+            element
             |>! OnMouseDown (fun el args ->
                 
                 let x, y = getXYFromMouseEvent el args
@@ -147,7 +157,7 @@ module Client =
                         // ctx.StrokeStyle <- "rgba(0,0,0,0)" // Nem írja felül ilyen módon a Stroke funkciót
                         
                         // Törlő ecset mérete kicsit nagyobb a brush méretéhez képest 
-                        let increasedSize = 20.0
+                        let increasedSize = float brushSize.Value
                         
                         let xConverted = float x + increasedSize
                         let yConverted = float y + increasedSize
@@ -171,9 +181,18 @@ module Client =
                     lastY := y
                     draw()
             )
-            |>! OnMouseEnter (fun el args -> updatePos <| getXYFromMouseEvent el args)
-            |>! OnMouseLeave (fun _ _ ->inLine := false)
-            P [B [Text "Draw with your mouse"]]
+            |>! OnMouseEnter (fun el args -> 
+                updatePos <| getXYFromMouseEvent el args
+                restoreCache()
+                drawStart()
+                drawEnd()
+                )
+            |>! OnMouseLeave (fun _ _ ->
+                inLine := false
+                CachedCanvas <- ctx.GetImageData(0.0,0.0,float canvas.Width,float canvas.Height)
+                )
+            
+            //P [B [Text "Draw with your mouse"]]
         ]
 
     let Main () =
@@ -191,9 +210,16 @@ module Client =
                         Doc.Input [
                         attr.``style`` "width:75px"
                         attr.``type`` "range"
-                        attr.``min`` "3"
-                        attr.``max`` "40"
-                        attr.``class`` "slider"] brushSize
+                        attr.``min`` "2"
+                        attr.``max`` "15"
+                        attr.``class`` "slider"] brushSize                        
+                        h3 [] [text "Collision Size:"]
+                        Doc.Input [
+                        attr.``style`` "width:75px"
+                        attr.``type`` "range"
+                        attr.``min`` "1"
+                        attr.``max`` "5"
+                        attr.``class`` "slider"] collisionSize
                     ]
                     tr [] [
                         h2 [] [text "Toggle brush types:"]
@@ -212,53 +238,68 @@ module Client =
                     
                     // Útvonal generálása gomb
                     Doc.Button "Create path!" [] (fun _ -> 
-                        
-                        // Elmentjük a canvas állapotát a kirajzolt útvonal előtt, így a következő kirajzoláskor nemkell bajlódni az útvonal által rajzolt vonalak eltüntetésével
-                        CachedCanvas <- ctx.GetImageData(0.0,0.0,float canvas.Width,float canvas.Height)
 
                         // Csak ilyen módon tudtam visszajuttatni a Canvas értékeit, egy string listában. Ezt fel kell radabolni hogy értelmezni is lehessen.
                         // A következő alapján működik: Első 4 elem: Első pixel R, G, B, Alpha értéke, így folytatva folyamatosan
                         
-                        // Konzultáció után
-                        let imgd = Foo CachedCanvas.Data
-                        //let imgd = CachedCanvas.Data
+                        // Kezdő és végpont pixelek eltávolítása
+                        clearStart()
+                        clearEnd()
+
+                        // Vászon mentése
+                        CachedCanvas <- ctx.GetImageData(0.0,0.0,float canvas.Width,float canvas.Height)
+                        let imgd = CachedCanvas.Data
 
                         // https://www.dotnetperls.com/split-fs
                         let result = (string imgd).Split ','
 
+                        // https://docs.microsoft.com/en-us/dotnet/fsharp/language-reference/arrays
+                        // Cél: Feldaraboljuk a string értékeit könnyebben értelmezhető 2 dimenziós listába
+                        let CanvasResult = Array2D.init canvas.Width canvas.Height (fun _ _ -> 
+
+                            // Mindegyik értéknek egy új instancenak kell lennie
+                            let x : CanvasNode = 
+                                { 
+                                    Red = 0;
+                                    Green = 0;
+                                    Blue = 0;
+                                    Alpha = 0
+                                }
+                            x
+                            )
+
                         // String elemeinek lebontása
                         let CanvasFilled = 
-                            
+
                             // Számláló
                             let mutable counter = 0
                             let Next() = counter <- counter + 1
-                            
-                            for x in  0 .. (canvas.Width-1)  do
-                                for y in 0 .. (canvas.Height-1)  do
-                                    
+
+                            for x in  0 .. 1 .. (canvas.Width-1)  do
+                                for y in 0 .. 1 .. (canvas.Height-1)  do
+
+                                    // Nem tudtam a Foo metódussal megoldani, mert nincs Set és Get metódusa a 
+                                    // imgd.[x].[y].Red <- (int result.[counter]) // Nem működik, GetLength se múködik
+
                                     // 4 elemenként: a sorrend: R, G, B, Alpha
-                                    imgd.[x].[y].Red <- (int result.[counter])
-                                    //CanvasResult.[x,y].Red <- (int result.[counter])
+                                    CanvasResult.[x,y].Red <- (int result.[counter])
                                     Next()
-                                    imgd.[x].[y].Green <- (int result.[counter])
-                                    //CanvasResult.[x,y].Green <- (int result.[counter])
+                                    CanvasResult.[x,y].Green <- (int result.[counter])
                                     Next()
-                                    imgd.[x].[y].Blue <- (int result.[counter])
-                                    //CanvasResult.[x,y].Blue <- (int result.[counter])
+                                    CanvasResult.[x,y].Blue <- (int result.[counter])
                                     Next()
-                                    imgd.[x].[y].Alpha <- (int result.[counter])
-                                    //CanvasResult.[x,y].Alpha <- (int result.[counter])
+                                    CanvasResult.[x,y].Alpha <- (int result.[counter])
                                     Next()
-                        
+
                         CanvasFilled
 
                         // Konzolos kirajzoláshoz, böngésző debug funkcióhoz
                         let DebugDisplay (a:int,b:int)= 
                             let p1 = string a + " "+ string b+ " "
-                            let p2 = "Red: " + (string imgd.[a].[b].Red) + " "
-                            let p3 = "Green: " + (string imgd.[a].[b].Green) + " "
-                            let p4 = "Blue: " + (string imgd.[a].[b].Blue) + " "
-                            let p5 = "Alpha: " + (string imgd.[a].[b].Alpha) + " "
+                            let p2 = "Red: " + (string CanvasResult.[a,b].Red) + " "
+                            let p3 = "Green: " + (string CanvasResult.[a,b].Green) + " "
+                            let p4 = "Blue: " + (string CanvasResult.[a,b].Blue) + " "
+                            let p5 = "Alpha: " + (string CanvasResult.[a,b].Alpha) + " "
                             p1+p2+p3+p4+p5 + "\n"
 
                         // Teszteléskor használva volt
@@ -266,31 +307,53 @@ module Client =
                         Console.Log(string imgd) // String
                         Console.Log(imgd) // Böngészőben vizsgálható így (Console, array stb)
 
-                        // Tömb kiírása
+                        // Tesztelés
                         let Debug() =
+                            
+                            // Ezzel a vászon üres lesz
                             canvas.Height <- canvas.Height
                             canvas.Width <- canvas.Width
+                            
+                            // Teszt
+                            Console.Log(canvas.Height)
+                            Console.Log(canvas.Width)
+
+                            //JS.Alert(string canvas.Height)
+                            //JS.Alert(string canvas.Width)
+                            let generatedPath: int[,] = CreatePath(CanvasResult,canvas.Height,canvas.Width,startX,startY,endX,endY,(int collisionSize.Value))
+                            Console.Log("Time to draw")
+                            restoreCache()
+                            drawStart()
+                            drawEnd()
+
                             for x in 0 .. 1 .. (canvas.Width-1) do
                                 for y in 0  .. 1 .. (canvas.Height-1) do
                                     (*
                                     if CanvasResult.[x,y].Alpha > 0 then
                                         ctx.FillStyle <- "#000000"
                                         ctx.FillRect(float y, float x, float 1, float 1)
-                                        *)
-                                    //(*
+                                    *)
+                                    
+                                    //(*// Tesztelés
+                                    if generatedPath.[x,y] > 0 then
+                                        ctx.FillStyle <- "red"
+                                        ctx.FillRect(float y, float x, float 1, float 1)
+                                    //*)
+                                    
+                                    (*
                                     ctx.FillStyle <- "rgba(
                                     "+(string imgd.[x].[y].Red)+",
                                     "+(string imgd.[x].[y].Green)+",
                                     "+(string imgd.[x].[y].Blue)+",
                                     "+(string imgd.[x].[y].Alpha)+")"
                                     ctx.FillRect(float y, float x, float 1, float 1)
-                                    //*)
+                                    *)
                             ctx.LineCap <- LineCap.Round
 
                         // Tesztelés, hogy jó helyen vannak-e a pixelek.
-                        //Debug()
+                        Debug()
 
-                        Console.Log(autoPathfind.Value)
+                        //Console.Log(autoPathfind.Value)
                     )
                     ]
                     tr [] [
@@ -304,11 +367,9 @@ module Client =
 
             br [] []
 
-            (*
-            Doc.Button "Debug" [] (fun _ -> 
-            ctx.PutImageData(CachedCanvas,0.0,0.0)
-            )
-            *)
+            //(*
+            Doc.Button "Debug" [] (fun _ -> restoreCache())
+            //*)
 
             // Alsó rész, 5x5 méret a minimum, maximum 500x500
             div [] [
@@ -326,8 +387,8 @@ module Client =
                         Doc.Input [
                         attr.``style`` "width:100px"
                         attr.``type`` "range"
-                        attr.``min`` "100"
-                        attr.``max`` "800"
+                        attr.``min`` "20"
+                        attr.``max`` "100"
                         attr.``class`` "slider"] MapSize
                     ]
                     
@@ -336,6 +397,7 @@ module Client =
                         Doc.Button "Reset/Clear" [attr.``style`` "background: red;color:white;"] (fun _ -> 
 
                             // https://stackoverflow.com/questions/2142535/how-to-clear-the-canvas-for-redrawing
+                            CachedCanvas <- Unchecked.defaultof<ImageData>
                             canvas.Height <- int MapSize.Value
                             canvas.Width <- int MapSize.Value
                             ctx.LineCap <- LineCap.Round

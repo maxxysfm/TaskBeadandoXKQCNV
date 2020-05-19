@@ -107,6 +107,7 @@
   <ItemGroup>
     <Compile Include="AssemblyInfo.fs" />
     <Compile Include="CanvasExtra.fs" />
+    <Compile Include="Radius.fs" />
     <Compile Include="Pathfind.fs" />
     <Compile Include="Client.fs" />
     <Compile Include="Main.fs" />
