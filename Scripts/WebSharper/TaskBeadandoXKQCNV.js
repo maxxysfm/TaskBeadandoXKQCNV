@@ -293,7 +293,7 @@
   }),Doc.Button("Pick End",[AttrProxy.Create("style","background: #aba8ff;color:black;")],function()
   {
    Client.set_brushMode(3);
-  }),Doc.Element("table",[],[Doc.Element("th",[],[Doc.Element("tr",[],[Doc.Element("h3",[],[Doc.TextNode("Brush size:")]),Doc.Input([AttrProxy.Create("style","width:75px"),AttrProxy.Create("type","range"),AttrProxy.Create("min","2"),AttrProxy.Create("max","15"),AttrProxy.Create("class","slider")],Client.brushSize()),Doc.Element("h3",[],[Doc.TextNode("Collision Size:")]),Doc.Input([AttrProxy.Create("style","width:75px"),AttrProxy.Create("type","range"),AttrProxy.Create("min","1"),AttrProxy.Create("max","5"),AttrProxy.Create("class","slider")],Client.collisionSize())]),Doc.Element("tr",[],[Doc.Element("h2",[],[Doc.TextNode("Toggle brush types:")]),Doc.Button("",[AttrProxy.Create("style","color:#a434b3;"),AttrProxy.Create("class","fa fa-eraser")],function()
+  }),Doc.Element("table",[],[Doc.Element("th",[],[Doc.Element("tr",[],[Doc.Element("h3",[],[Doc.TextNode("Brush size:")]),Doc.Input([AttrProxy.Create("style","width:75px"),AttrProxy.Create("type","range"),AttrProxy.Create("min","1"),AttrProxy.Create("max","4"),AttrProxy.Create("class","slider")],Client.brushSize()),Doc.Element("h3",[],[Doc.TextNode("Collision Size:")]),Doc.Input([AttrProxy.Create("style","width:75px"),AttrProxy.Create("type","range"),AttrProxy.Create("min","0"),AttrProxy.Create("max","5"),AttrProxy.Create("class","slider")],Client.collisionSize())]),Doc.Element("tr",[],[Doc.Element("h2",[],[Doc.TextNode("Toggle brush types:")]),Doc.Button("",[AttrProxy.Create("style","color:#a434b3;"),AttrProxy.Create("class","fa fa-eraser")],function()
   {
    Client.set_brushMode(1);
   }),Doc.Button("",[AttrProxy.Create("style","color:#b35034;"),AttrProxy.Create("class","fa fa-edit")],function()
@@ -306,6 +306,7 @@
    {
     counter=counter+1;
    }
+   Client.restoreCache();
    Client.clearStart();
    Client.clearEnd();
    Client.set_CachedCanvas(Client.ctx().getImageData(0,0,Client.canvas().width,Client.canvas().height));
@@ -382,7 +383,7 @@
        while(e$3.MoveNext())
         {
          y$1=e$3.Current();
-         Arrays.get2D(generatedPath,x$1,y$1)>0?(Client.ctx().fillStyle="red",Client.ctx().fillRect(y$1,x$1,1,1)):void 0;
+         Arrays.get2D(generatedPath,x$1,y$1)>0?(Client.ctx().fillStyle="red",Client.ctx().fillRect(y$1,x$1,2,2)):void 0;
         }
       }
       finally
@@ -398,10 +399,7 @@
      e$2.Dispose();
    }
    Client.ctx().lineCap="round";
-  })]),Doc.Element("tr",[],[Doc.Element("h3",[AttrProxy.Create("style","text-align: center;")],[Doc.TextNode("Auto pathfind:")]),Doc.CheckBox([AttrProxy.Create("style","text-align: center;\r\n                    vertical-align: middle;\r\n                    margin-left: 50px;")],Client.autoPathfind())])])]),Doc.Element("br",[],[]),Doc.Button("Debug",[],function()
-  {
-   Client.restoreCache();
-  }),Doc.Element("div",[],[Doc.Element("h1",[],[Doc.TextNode("Edit map")]),Doc.Element("table",[],[Doc.Element("tr",[],[Doc.Element("td",[],[Doc.Element("h3",[],[Doc.TextNode("Map Size:")]),Doc.Input([AttrProxy.Create("style","width:100px"),AttrProxy.Create("type","range"),AttrProxy.Create("min","20"),AttrProxy.Create("max","100"),AttrProxy.Create("class","slider")],Client.MapSize())]),Doc.Element("td",[],[Doc.Button("Reset/Clear",[AttrProxy.Create("style","background: red;color:white;")],function()
+  })])])]),Doc.Element("br",[],[]),Doc.Element("div",[],[Doc.Element("h1",[],[Doc.TextNode("Edit map")]),Doc.Element("table",[],[Doc.Element("tr",[],[Doc.Element("td",[],[Doc.Element("h3",[],[Doc.TextNode("Map Size:")]),Doc.Input([AttrProxy.Create("style","width:100px"),AttrProxy.Create("type","range"),AttrProxy.Create("min","20"),AttrProxy.Create("max","100"),AttrProxy.Create("class","slider")],Client.MapSize())]),Doc.Element("td",[],[Doc.Button("Reset/Clear",[AttrProxy.Create("style","background: red;color:white;")],function()
   {
    Client.set_CachedCanvas(null);
    Client.canvas().height=Operators.toInt(Global.Number(Client.MapSize().Get()));
@@ -459,7 +457,7 @@
    return Client.set_CachedCanvas(Client.ctx().getImageData(0,0,Client.canvas().width,Client.canvas().height));
   }
   Client.draw();
-  return Operators$1.add((a=[Attr.Attr().NewAttr("class","zoom"),Attr.Attr().NewAttr("style","\r\n        width:300px;\r\n        border: 4px;\r\n        text-align: center; \r\n        cursor: crosshair;\r\n        image-rendering: crisp-edges;\r\n        -ms-interpolation-mode: nearest-neighbor;\r\n        ")],Tags.Tags().NewTag("div",a)),[Client.labelPos(),Tags.Tags().NewTag("br",[]),(x=(x$1=(x$2=(x$3=(x$4=Client.element(),(function(a$6)
+  return Operators$1.add((a=[Attr.Attr().NewAttr("class","zoom"),Attr.Attr().NewAttr("style","\r\n        width:300px;\r\n        border: 4px;\r\n        text-align: center; \r\n        cursor: crosshair;\r\n        image-rendering: crisp-edges;\r\n        -ms-interpolation-mode: nearest-neighbor;\r\n        ")],Tags.Tags().NewTag("div",a)),[Client.labelPos(),Tags.Tags().NewTag("br",[]),(x=(x$1=(x$2=(x$3=(x$4=Operators$1.add(Client.element(),[Attr.Attr().NewAttr("style","border: 2px solid black")]),(function(a$6)
   {
    EventsPervasives.Events().OnMouseDown(function($1)
    {
@@ -517,21 +515,26 @@
  };
  Client.clearEnd=function()
  {
-  Client.ctx().clearRect(Client.endX(),Client.endY(),Client.BorderSize(),Client.BorderSize());
+  Client.ctx().clearRect(Client.endX(),Client.endY(),Client.BorderSize()+Client.drawSizeIncrease(),Client.BorderSize()+Client.drawSizeIncrease());
  };
  Client.drawEnd=function()
  {
   Client.ctx().fillStyle="#0000ff";
-  Client.ctx().fillRect(Client.endX(),Client.endY(),Client.BorderSize(),Client.BorderSize());
+  Client.ctx().fillRect(Client.endX(),Client.endY(),Client.BorderSize()+Client.drawSizeIncrease(),Client.BorderSize()+Client.drawSizeIncrease());
  };
  Client.clearStart=function()
  {
-  Client.ctx().clearRect(Client.startX(),Client.startY(),Client.BorderSize(),Client.BorderSize());
+  Client.ctx().clearRect(Client.startX(),Client.startY(),Client.BorderSize()+Client.drawSizeIncrease(),Client.BorderSize()+Client.drawSizeIncrease());
  };
  Client.drawStart=function()
  {
   Client.ctx().fillStyle="#00ff00";
-  Client.ctx().fillRect(Client.startX(),Client.startY(),Client.BorderSize(),Client.BorderSize());
+  Client.ctx().fillRect(Client.startX(),Client.startY(),Client.BorderSize()+Client.drawSizeIncrease(),Client.BorderSize()+Client.drawSizeIncrease());
+ };
+ Client.drawSizeIncrease=function()
+ {
+  SC$2.$cctor();
+  return SC$2.drawSizeIncrease;
  };
  Client.ctx=function()
  {
@@ -683,7 +686,7 @@
   SC$2.$cctor=Global.ignore;
   SC$2.initialSize=50;
   SC$2.initialOffset=3;
-  SC$2.BorderSize=3;
+  SC$2.BorderSize=0;
   SC$2.startX=Client.initialOffset();
   SC$2.startY=Client.initialOffset();
   SC$2.endX=Client.initialSize()-Client.initialOffset();
@@ -705,6 +708,7 @@
   Client.canvas().width=Operators.toInt(Global.Number(Client.MapSize().Get()));
   SC$2.ctx=Client.canvas().getContext("2d");
   Client.ctx().lineCap="round";
+  SC$2.drawSizeIncrease=2;
  };
  Runtime.OnLoad(function()
  {

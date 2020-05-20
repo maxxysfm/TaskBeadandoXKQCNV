@@ -18,7 +18,7 @@ module Client =
     // Pálya beállítások
     let initialSize = 50
     let initialOffset = 3
-    let BorderSize = 3.0
+    let BorderSize = 0.0
     let mutable startX: int = initialOffset
     let mutable startY: int = initialOffset
     let mutable endX:int = initialSize - initialOffset
@@ -29,7 +29,9 @@ module Client =
     let mutable brushMode = 0
 
     // Beállítások A*-hoz
-    let collisionSize = Var.Create (string 1)
+
+    // Hány pixelel távolságot kell tartania az algoritmusnak az akadályokról
+    let collisionSize = Var.Create (string 0)
     let autoPathfind = Var.Create false
     
     // Mentés
@@ -38,10 +40,11 @@ module Client =
     // Ide kerül mentésre a vászon eredeti adatai, a kirajzolt útvonal nélkül
     let mutable CachedCanvas : ImageData = Unchecked.defaultof<ImageData>
 
-    // https://try.websharper.com/snippet/WebSharper/00000f
     // Vászonhoz szükséges adatok.
     let MapSize = Var.Create (string initialSize) // Default méret
 
+    // FELHASZNÁLT FORRÁS:
+    // https://try.websharper.com/example/drawing-around / https://try.websharper.com/snippet/WebSharper/00000f
     let element = Tags.Canvas []
     let lastX, lastY, inLine = ref 0, ref 0, ref false
     let labelPos = Span [Text "Position:"]
@@ -64,25 +67,26 @@ module Client =
     // Vászon frissítésekor újra kell beállítani
     ctx.LineCap <- LineCap.Round
     
+    let drawSizeIncrease = 2.0
     let drawStart() = 
         
         // Green
         ctx.FillStyle <- "#00ff00"
-        ctx.FillRect(float startX, float startY, BorderSize, BorderSize)
+        ctx.FillRect(float startX, float startY, BorderSize+ drawSizeIncrease, BorderSize+drawSizeIncrease)
         
     let clearStart() = 
         
-        ctx.ClearRect(float startX, float startY, BorderSize, BorderSize)
+        ctx.ClearRect(float startX, float startY, BorderSize+drawSizeIncrease, BorderSize+drawSizeIncrease)
     
     let drawEnd() = 
         
         // Blue
         ctx.FillStyle <- "#0000ff"
-        ctx.FillRect(float endX, float endY, BorderSize, BorderSize)
+        ctx.FillRect(float endX, float endY, BorderSize+drawSizeIncrease, BorderSize+drawSizeIncrease)
         
     let clearEnd() = 
         
-        ctx.ClearRect(float endX, float endY, BorderSize, BorderSize)
+        ctx.ClearRect(float endX, float endY, BorderSize+drawSizeIncrease, BorderSize+drawSizeIncrease)
     
     let draw() =
         drawStart()
@@ -100,7 +104,8 @@ module Client =
         
         draw()
 
-        //let upscaleRatio = 2.0
+        //ctx.Scale(2.0,2.0)
+        //ctx.Translate(25.0,25.0)
 
         Div [
         Attr.Class "zoom"
@@ -114,7 +119,7 @@ module Client =
         "] -< [
             labelPos
             Br []
-            element
+            element -< [Attr.Style "border: 2px solid black"]
             |>! OnMouseDown (fun el args ->
                 
                 let x, y = getXYFromMouseEvent el args
@@ -210,14 +215,14 @@ module Client =
                         Doc.Input [
                         attr.``style`` "width:75px"
                         attr.``type`` "range"
-                        attr.``min`` "2"
-                        attr.``max`` "15"
+                        attr.``min`` "1"
+                        attr.``max`` "4"
                         attr.``class`` "slider"] brushSize                        
                         h3 [] [text "Collision Size:"]
                         Doc.Input [
                         attr.``style`` "width:75px"
                         attr.``type`` "range"
-                        attr.``min`` "1"
+                        attr.``min`` "0"
                         attr.``max`` "5"
                         attr.``class`` "slider"] collisionSize
                     ]
@@ -242,6 +247,8 @@ module Client =
                         // Csak ilyen módon tudtam visszajuttatni a Canvas értékeit, egy string listában. Ezt fel kell radabolni hogy értelmezni is lehessen.
                         // A következő alapján működik: Első 4 elem: Első pixel R, G, B, Alpha értéke, így folytatva folyamatosan
                         
+                        restoreCache()
+
                         // Kezdő és végpont pixelek eltávolítása
                         clearStart()
                         clearEnd()
@@ -337,7 +344,7 @@ module Client =
                                     //(*// Tesztelés
                                     if generatedPath.[x,y] > 0 then
                                         ctx.FillStyle <- "red"
-                                        ctx.FillRect(float y, float x, float 1, float 1)
+                                        ctx.FillRect(float y, float x, float 2, float 2)
                                     //*)
                                     
                                     (*
@@ -356,20 +363,20 @@ module Client =
                         //Console.Log(autoPathfind.Value)
                     )
                     ]
-                    tr [] [
+                    (*tr [] [
                     h3 [attr.``style`` "text-align: center;"] [text "Auto pathfind:"]
                     Doc.CheckBox [attr.``style`` "text-align: center;
                     vertical-align: middle;
                     margin-left: 50px;"] autoPathfind
-                    ]
+                    ]*)
                 ]
             ]
 
             br [] []
 
-            //(*
+            (*
             Doc.Button "Debug" [] (fun _ -> restoreCache())
-            //*)
+            *)
 
             // Alsó rész, 5x5 méret a minimum, maximum 500x500
             div [] [
