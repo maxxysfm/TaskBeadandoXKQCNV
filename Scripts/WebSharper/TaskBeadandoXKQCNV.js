@@ -399,7 +399,16 @@
      e$2.Dispose();
    }
    Client.ctx().lineCap="round";
-  })])])]),Doc.Element("br",[],[]),Doc.Element("div",[],[Doc.Element("h1",[],[Doc.TextNode("Edit map")]),Doc.Element("table",[],[Doc.Element("tr",[],[Doc.Element("td",[],[Doc.Element("h3",[],[Doc.TextNode("Map Size:")]),Doc.Input([AttrProxy.Create("style","width:100px"),AttrProxy.Create("type","range"),AttrProxy.Create("min","20"),AttrProxy.Create("max","100"),AttrProxy.Create("class","slider")],Client.MapSize())]),Doc.Element("td",[],[Doc.Button("Reset/Clear",[AttrProxy.Create("style","background: red;color:white;")],function()
+  })])])]),Doc.Element("br",[],[]),Doc.Button("Debug",[],function()
+  {
+   Client.restoreCache();
+  }),Doc.Button("DebugSmoll",[],function()
+  {
+   Client.ctx().scale(0.5,0.5);
+  }),Doc.Button("DebugLargeBoi",[],function()
+  {
+   Client.ctx().scale(2,2);
+  }),Doc.Element("div",[],[Doc.Element("h1",[],[Doc.TextNode("Edit map")]),Doc.Element("table",[],[Doc.Element("tr",[],[Doc.Element("td",[],[Doc.Element("h3",[],[Doc.TextNode("Map Size:")]),Doc.Input([AttrProxy.Create("style","width:100px"),AttrProxy.Create("type","range"),AttrProxy.Create("min","20"),AttrProxy.Create("max","100"),AttrProxy.Create("class","slider")],Client.MapSize())]),Doc.Element("td",[],[Doc.Button("Reset/Clear",[AttrProxy.Create("style","background: red;color:white;")],function()
   {
    Client.set_CachedCanvas(null);
    Client.canvas().height=Operators.toInt(Global.Number(Client.MapSize().Get()));
@@ -693,7 +702,7 @@
   SC$2.endY=Client.initialSize()-Client.initialOffset();
   SC$2.brushSize=Var$1.Create$1(Global.String(2));
   SC$2.brushMode=0;
-  SC$2.collisionSize=Var$1.Create$1(Global.String(1));
+  SC$2.collisionSize=Var$1.Create$1(Global.String(0));
   SC$2.autoPathfind=Var$1.Create$1(false);
   SC$2.CachedCanvas=null;
   SC$2.MapSize=Var$1.Create$1(Global.String(Client.initialSize()));

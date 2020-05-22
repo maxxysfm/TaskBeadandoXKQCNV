@@ -376,6 +376,11 @@ module Client =
 
             (*
             Doc.Button "Debug" [] (fun _ -> restoreCache())
+            Doc.Button "DebugSmoll" [] (fun _ -> 
+            
+            ctx.Scale(0.5,0.5))
+            Doc.Button "DebugLargeBoi" [] (fun _ -> ctx.Scale(2.0,2.0))
+            
             *)
 
             // Alsó rész, 5x5 méret a minimum, maximum 500x500
